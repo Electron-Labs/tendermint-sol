@@ -9,20 +9,20 @@ contract Secp256k1Mock {
         return Secp256k1.serializePubkey(pubkey, prefix);
     }
 
-    function verify(
-        bytes memory message,
-        bytes memory publicKey,
-        bytes memory sig
-    ) public view returns (bool) {
-        return Secp256k1.verify(message, publicKey, sig);
-    }
+    // function verify(
+    //     bytes memory message,
+    //     bytes memory publicKey,
+    //     bytes memory sig
+    // ) public view returns (bool) {
+    //     return Secp256k1.verify(message, publicKey, sig);
+    // }
 
-    function recover(
-        bytes memory message,
-        bytes memory sig,
-        uint8 v
-    ) public pure returns (address) {
-        (address recovered, ) = Secp256k1.tryRecover(sha256(message), sig, v);
-        return recovered;
-    }
+    // function recover(
+    //     bytes memory message,
+    //     bytes memory sig,
+    //     uint8 v
+    // ) public pure returns (address) {
+    //     (address recovered, ) = Secp256k1.tryRecover(sha256(message), sig, v);
+    //     return recovered;
+    // }
 }
