@@ -22,6 +22,7 @@ function deployLightClient(deployer) {
 	const IBCMsgs = artifacts.require("IBCMsgs");
 	const IBCIdentifier = artifacts.require("IBCIdentifier");
 	const TendermintLightClient = artifacts.require("TendermintLightClient");
+	const IBCChannelExtension = artifacts.require("IBCChannelExtension");
 
 	// libs
 	const Bytes = artifacts.require("Bytes");
@@ -30,18 +31,20 @@ function deployLightClient(deployer) {
 	  return deployer.link(IBCIdentifier, [IBCHost, TendermintLightClient, IBCHandler]);
 	});
 	deployer.deploy(IBCMsgs).then(function() {
-	  return deployer.link(IBCMsgs, [IBCClient, IBCConnection, IBCChannel, IBCHandler, TendermintLightClient]);
+	  return deployer.link(IBCMsgs, [IBCClient, IBCConnection, IBCChannel, IBCChannelExtension, IBCHandler, TendermintLightClient]);
 	});
 	deployer.deploy(IBCClient).then(function() {
-	  return deployer.link(IBCClient, [IBCHandler, IBCConnection, IBCChannel]);
+	  return deployer.link(IBCClient, [IBCHandler, IBCConnection, IBCChannel, IBCChannelExtension]);
 	});
 	deployer.deploy(IBCConnection).then(function() {
-	  return deployer.link(IBCConnection, [IBCHandler, IBCChannel]);
+	  return deployer.link(IBCConnection, [IBCHandler, IBCChannel, IBCChannelExtension]);
 	});
 	deployer.deploy(IBCChannel).then(function() {
 	  return deployer.link(IBCChannel, [IBCHandler]);
 	});
-
+	deployer.deploy(IBCChannelExtension).then(function() {
+		return deployer.link(IBCChannelExtension, [IBCHandler]);
+	});
 	// TODO: truffle fails to deploy the library automatically,
 	// explicit link solves the issue, but still not sure why this is
     // needed... it seems that Bytes is deployed as separate contract?
