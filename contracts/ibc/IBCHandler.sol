@@ -6,6 +6,7 @@ pragma solidity ^0.8.2;
 import "./IClient.sol";
 import "./IBCClient.sol";
 import "./IBCChannel.sol";
+import "./IBCChannelExtension.sol";
 import "./IBCModule.sol";
 import "./IBCMsgs.sol";
 import "./IBCIdentifier.sol";
@@ -118,16 +119,16 @@ contract IBCHandler {
             IBCIdentifier.channelCapabilityPath(packet.source_port, packet.source_channel),
             msg.sender
         ));
-        IBCChannel.sendPacket(host, packet);
+        IBCChannelExtension.sendPacket(host, packet);
         emit SendPacket(packet);
     }
 
     function recvPacket(IBCMsgs.MsgPacketRecv calldata msg_) external returns (bytes memory acknowledgement) {
         IModuleCallbacks module = lookupModuleByChannel(msg_.packet.destination_port, msg_.packet.destination_channel);
         acknowledgement = module.onRecvPacket(msg_.packet);
-        IBCChannel.recvPacket(host, msg_);
+        IBCChannelExtension.recvPacket(host, msg_);
         if (acknowledgement.length > 0) {
-            IBCChannel.writeAcknowledgement(host, msg_.packet.destination_port, msg_.packet.destination_channel, msg_.packet.sequence, acknowledgement);
+            IBCChannelExtension.writeAcknowledgement(host, msg_.packet.destination_port, msg_.packet.destination_channel, msg_.packet.sequence, acknowledgement);
             emit WriteAcknowledgement(msg_.packet.destination_port, msg_.packet.destination_channel, msg_.packet.sequence, acknowledgement);
         }
         emit RecvPacket(msg_.packet);
@@ -139,14 +140,14 @@ contract IBCHandler {
             IBCIdentifier.channelCapabilityPath(destinationPortId, destinationChannel),
             msg.sender
         ));
-        IBCChannel.writeAcknowledgement(host, destinationPortId, destinationChannel, sequence, acknowledgement);
+        IBCChannelExtension.writeAcknowledgement(host, destinationPortId, destinationChannel, sequence, acknowledgement);
         emit WriteAcknowledgement(destinationPortId, destinationChannel, sequence, acknowledgement);
     }
 
     function acknowledgePacket(IBCMsgs.MsgPacketAcknowledgement calldata msg_) external {
         IModuleCallbacks module = lookupModuleByChannel(msg_.packet.source_port, msg_.packet.source_channel);
         module.onAcknowledgementPacket(msg_.packet, msg_.acknowledgement);
-        IBCChannel.acknowledgePacket(host, msg_);
+        IBCChannelExtension.acknowledgePacket(host, msg_);
         emit AcknowledgePacket(msg_.packet, msg_.acknowledgement);
     }
 
